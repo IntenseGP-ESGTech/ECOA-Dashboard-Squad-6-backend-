@@ -4,10 +4,6 @@
 Comunidade que transforma inovação em impacto.
 </h3>
 
-<p align="center">
-<img src="./docs/ecoa-login.png" width="500px" alt="Tela de login do ECOA"/>
-</p>
-
 ---
 
 ## 📘 Sobre o Projeto
