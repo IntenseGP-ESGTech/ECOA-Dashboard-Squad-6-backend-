@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { User, ArrowLeft } from "lucide-react";
+import { useUser } from "../../context";
 import './minha_conta.css';
 
 function MinhaConta() {
+  const {user} = useUser();
+  
   const [userData, setUserData] = useState({
-    nome: "Usuário Demo",
-    email: "usuario@email.com",
-    cargo: "Analista",
-    departamento: "Tecnologia",
-    telefone: "(11) 99999-9999"
+    nome: user.nome,
+    email: user.email,
+    cargo: user.cargo,
+    departamento: user.departamento,
+    telefone: user.telefone
   });
 
   const handleChange = (e) => {

@@ -25,11 +25,13 @@ import Relatorio from "../src/screens/relatorio";
 import Config from "../src/screens/config";
 import Sair from "../src/screens/sair";
 import Chatbot from "../src/componentes/chatbot";
+import { UserProvider } from "./context";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
+    <UserProvider>
     <div className="app-background">
       <div className="app-content">
         <Router>
@@ -165,6 +167,7 @@ function App() {
         </Router>
       </div>
     </div>
+  </UserProvider>
   );
 }
 

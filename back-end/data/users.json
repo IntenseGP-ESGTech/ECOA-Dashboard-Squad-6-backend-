@@ -1,0 +1,7 @@
+[{"id":1,
+    "nome":"usuario",
+        "email":"teste@teste.com",
+        "senha":"123456",
+        "cargo":"testador",
+        "departamento": "testes",
+        "telefone": "(00)00000-0000"}]

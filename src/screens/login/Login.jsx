@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import Botao from "../../componentes/botao/Botao";
 import { FaUser, FaLock } from "react-icons/fa";
-import { authenticate } from "./auth";
+import { authenticate, loadUser } from "./auth";
+import {useUser} from "../../context";
 
 const Login = ({ setIsAuthenticated }) => {
   const [credentials, setCredentials] = useState({
@@ -13,6 +14,7 @@ const Login = ({ setIsAuthenticated }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const {login} = useUser();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,6 +43,8 @@ const Login = ({ setIsAuthenticated }) => {
       );
       if (authResult.success) {
         setIsAuthenticated(true); // Atualiza o estado no App
+        const data = await loadUser(credentials.email); //carrega as informações de usuário no contexto
+        login(data.user);
         navigate("/dashboard", { replace: true }); // Redireciona para o dashboard
       } else {
         setError("Credenciais inválidas. Por favor, tente novamente.");
