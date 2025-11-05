@@ -26,7 +26,7 @@ function salvarUsers(users){
 
 
 //login (post)
-app.post("/login", (req,res)=>{
+app.post("/user/login", (req,res)=>{
     const {email, senha} = req.body;
 
     const usuarios = lerUsers();
@@ -36,9 +36,9 @@ app.post("/login", (req,res)=>{
     );
 
     if(user){
-        res.json({
+        res.status(200).json({
             success : true,
-            user: {email: user.email, name: user.name},
+            user: {email: user.email, nome: user.nome, cargo: user.cargo, departamento: user.departamento, telefone: user.telefone},
         });
     } else {
         res.status(401).json({
@@ -49,18 +49,18 @@ app.post("/login", (req,res)=>{
 
 });
 
-//TODO loadUser
-app.post("/loadUser", (req,res)=>{
-    const {email} = req.body;
+//loadUser não é mais usada. agora user/login autentica e salva usuario
+// app.post("/loadUser", (req,res)=>{
+//     const {email} = req.body;
 
-    const usuarios = lerUsers();
+//     const usuarios = lerUsers();
 
-    const user = usuarios.find((u) => u.email === email);
+//     const user = usuarios.find((u) => u.email === email);
 
-    res.json({
-        user: {nome: user.nome, email: user.email, cargo: user.cargo, departamento: user.departamento, telefone: user.telefone}
-    });
-});
+//     res.json({
+//         user: {nome: user.nome, email: user.email, cargo: user.cargo, departamento: user.departamento, telefone: user.telefone}
+//     });
+// });
 
 // função de criar(post)
 app.post("/users", (req, res)=>{
@@ -88,10 +88,31 @@ app.post("/users", (req, res)=>{
 });
 
 //função de read(get)
-app.get("/users", (req, res) => {
+app.get("/user/users", (req, res) => {
     const users = lerUsers();
-    res.json(users);
+    if(users.length>0){
+        res.status(200).json(users)
+    } else {
+        res.status(404).json({erro: "Nenhum usuário encontrado"})
+    }
+    
 });
+
+//função get by id(get)
+app.get("/user/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const users = lerUsers();
+    const index = users.findIndex(f => f.id === id);
+
+    if (index === -1){
+        return res.status(404).json({erro: "Usuário não encontrado."});
+    }
+
+    const user = users[index];
+
+    res.status(200).json(user);
+});
+
 
 //função de update(put)
 app.put("/users/:id", (req, res) => {

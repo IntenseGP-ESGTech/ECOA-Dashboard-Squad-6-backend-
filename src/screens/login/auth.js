@@ -21,7 +21,7 @@
 
 export const authenticate = async (email, senha) => {
   try {
-    const response = await fetch("http://localhost:3001/login", {
+    const response = await fetch("http://localhost:3001/user/login", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({ email, senha}),
@@ -34,14 +34,3 @@ export const authenticate = async (email, senha) => {
     return {success: false, message: "Erro de conexão com o servidor"};
   }
 };
-
-export const loadUser = async (email) => {
-  const response = await fetch("http://localhost:3001/loadUser", {
-    method: "POST",
-    headers : {"Content-Type": "application/json"},
-    body: JSON.stringify({email})
-  });
-
-  const data = await response.json();
-  return data;
-}
