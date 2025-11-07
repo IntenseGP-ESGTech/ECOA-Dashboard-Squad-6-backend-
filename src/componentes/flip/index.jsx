@@ -34,21 +34,7 @@ function Flip({ setIsAuthenticated }) {
         </div>
       </div>
 
-      <div className="back">
-        <Cadastro />
-        <div className="links">
-          <p> Faça login com </p>
-          <a href="https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.google.com%2Fwebhp%3Fhl%3Dpt-BR%26sa%3DX%26ved%3D0ahUKEwjg2I3cotONAxXdExAIHXtONRoQPAgJ&ec=futura_exp_og_so_72776762_e&hl=pt-BR&ifkv=AdBytiP27OkCLHw4d-G9GZKVCqNXt5LBEk1yrsckBYHRPZbscAcmoomvU1K8mcrlCVlZ868CiVZy&passive=true&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S2030322199%3A1748888327008065">
-            <img src="/assets/google.png" alt="" />
-          </a>
-        </div>
-        <div className="text-link" onClick={() => setIsFlipped(false)}>
-          <Botao
-            bgColor="rgba(0, 0, 0, 0)"
-            nome={<i className="fa-regular fa-circle-left"></i>}
-          />
-        </div>
-      </div>
+      {/* back page removida para exibir apenas a face da frente */}
     </div>
   );
 }

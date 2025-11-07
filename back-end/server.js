@@ -31,8 +31,14 @@ app.post("/user/login", (req,res)=>{
 
     const usuarios = lerUsers();
 
+    // Valida email e senha, e se cnpj for fornecido, valida também
     const user = usuarios.find(
-        (u) => u.email === email && u.senha === senha
+        (u) => {
+            const emailMatch = u.email === email;
+            const senhaMatch = u.senha === senha;
+            
+            return emailMatch && senhaMatch;
+        }
     );
 
     if(user){

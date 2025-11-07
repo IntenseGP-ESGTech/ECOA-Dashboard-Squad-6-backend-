@@ -6,9 +6,9 @@ import {
   Navigate,
 } from "react-router-dom";
 import "./App.css";
+import Cadastro from "../src/screens/cadastro/Cadastro"; 
 import logo from "./assets/logo.png";
-import Flip from "../src/componentes/flip";
-import Login from "../src/screens/login/Login";
+import Login from "../src/screens/login/Login"; 
 import Dashboard from "../src/screens/dashboard";
 import BusinessAnalytics from "../src/screens/business_analytics";
 import TeamManagement from "../src/screens/team_management";
@@ -37,20 +37,10 @@ function App() {
         <Router>
           {isAuthenticated && <Chatbot />}
           <Routes>
+             <Route path="/cadastro" element={<Cadastro />} />
             <Route
               path="/"
-              element={
-                <div className="Container">
-                  <div className="logo-container">
-                    <img src={logo} className="logo" alt="logo" />
-                    <p className="title">
-                      Acesse sua conta e junte-se a uma comunidade que transforma
-                      inovação em impacto.
-                    </p>
-                  </div>
-                  <Flip setIsAuthenticated={setIsAuthenticated} />
-                </div>
-              }
+              element={<Login setIsAuthenticated={setIsAuthenticated} />}
             />
 
             <Route
