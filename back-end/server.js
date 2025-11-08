@@ -24,6 +24,23 @@ function salvarUsers(users){
     fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
 }
 
+//questionário
+const questionarioPath = path.join(__dirname, "data", "questionarios.json");
+
+function lerQuestionarios(){
+    // Implementa um try-catch para evitar falha se o arquivo estiver vazio
+    try {
+        const data = fs.readFileSync(questionarioPath, "utf-8");
+        return JSON.parse(data);
+    } catch (error) {
+        // Retorna array vazio em caso de erro de leitura (arquivo inexistente/vazio)
+        return []; 
+    }
+}
+
+function salvarQuestionarios(questionarios){
+    fs.writeFileSync(questionarioPath, JSON.stringify(questionarios, null, 2));
+}
 
 //login (post)
 app.post("/user/login", (req,res)=>{
@@ -144,6 +161,35 @@ app.delete('/funcionarios/:id', (req, res)=>{
     users = users.filter(f=> f.id !== id);
     salvarUsers(users);
     res.status(204).send();
+});
+
+// POST: Salvar a conclusão do questionário
+// Endpoint: /questionario/concluir
+app.post("/questionario/concluir", (req, res) => {
+    const dadosQuestionario = req.body;
+
+    if (!dadosQuestionario || Object.keys(dadosQuestionario).length === 0) {
+        // Retorna erro se o corpo da requisição estiver vazio
+        return res.status(400).json({ erro: "Dados do questionário estão incompletos ou vazios." });
+    }
+
+    const questionarios = lerQuestionarios();
+
+    const novoQuestionario = {
+        // Gera um ID sequencial baseado no último ID salvo
+        id: questionarios.length ? questionarios[questionarios.length - 1].id + 1 : 1,
+        dataConclusao: new Date().toISOString(),
+        ...dadosQuestionario 
+    };
+
+    questionarios.push(novoQuestionario);
+    salvarQuestionarios(questionarios);
+    
+    res.status(201).json({
+        success: true,
+        message: "Conclusão do questionário salva com sucesso!",
+        registro: novoQuestionario
+    });
 });
 
 app.listen(PORT, () => {
