@@ -42,6 +42,9 @@ function salvarQuestionarios(questionarios){
     fs.writeFileSync(questionarioPath, JSON.stringify(questionarios, null, 2));
 }
 
+//Usuários
+
+
 //login (post)
 app.post("/user/login", (req,res)=>{
     const {email, senha} = req.body;
@@ -86,28 +89,32 @@ app.post("/user/login", (req,res)=>{
 // });
 
 // função de criar(post)
-app.post("/users", (req, res)=>{
-    const {nome, email, senha, cargo, departamento, telefone} = req.body;
+app.post("/user/register", (req, res)=>{
+    const {cnpj, nome, senha, email} = req.body;
 
-    if(!nome || !email || !cargo || !departamento || !telefone){
-        return res.status(400).json({erro: "Todos os campos são obrigatórios."})
+    if(!nome || !email || !cnpj || !senha){
+        return res.status(400).json({success: false, erro: "Todos os campos são obrigatórios."})
     }
 
     const users = lerUsers();
+    
+    for (let user of users){
+        if (user.cnpj == cnpj){
+            return res.status(400).json({success: false, erro: "Cnpj já cadastrado."})
+        }
+    }
+
     const novoUser = {
-        id: users.length ? users[users.length - 1].id + 1 : 1,
+        cnpj,
         nome,
         email,
-        senha,
-        cargo,
-        departamento,
-        telefone
+        senha
     };
 
     users.push(novoUser);
     salvarUsers(users);
 
-    res.status(201).json(novoUser);
+    res.status(201).json({success: true, user:novoUser});
 });
 
 //função de read(get)
