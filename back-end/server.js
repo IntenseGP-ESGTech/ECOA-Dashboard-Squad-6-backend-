@@ -13,33 +13,43 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const filePath = path.join(__dirname, "data", "users.json");
+//Configuração Users
+const usersFilePath = path.join(__dirname, "data", "users.json");
 
 function lerUsers(){
-    const data = fs.readFileSync(filePath, "utf-8");
+    const data = fs.readFileSync(usersFilePath, "utf-8");
     return JSON.parse(data);
 }
 
 function salvarUsers(users){
-    fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
+    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
 }
 
-//questionário
-const questionarioPath = path.join(__dirname, "data", "questionarios.json");
+const questionariosCompletosPath = path.join(__dirname, "data", "questionarios_completos.json");
 
-function lerQuestionarios(){
-    // Implementa um try-catch para evitar falha se o arquivo estiver vazio
+function lerQuestionariosCompletos() {
     try {
-        const data = fs.readFileSync(questionarioPath, "utf-8");
-        return JSON.parse(data);
+        const data = fs.readFileSync(questionariosCompletosPath, "utf-8");
+        if (data.trim().length > 0) {
+            return JSON.parse(data);
+        }
+        return [];
     } catch (error) {
-        // Retorna array vazio em caso de erro de leitura (arquivo inexistente/vazio)
-        return []; 
+        return [];
     }
 }
 
-function salvarQuestionarios(questionarios){
-    fs.writeFileSync(questionarioPath, JSON.stringify(questionarios, null, 2));
+function salvarQuestionariosCompletos(data) {
+    fs.writeFileSync(questionariosCompletosPath, JSON.stringify(data, null, 2));
+}
+
+//conversão para booleano
+function converterParaBooleano(respostas) {
+    const respostasBooleanas = {};
+    for (const key in respostas) {
+        respostasBooleanas[key] = respostas[key].toUpperCase() === "SIM";
+    }
+    return respostasBooleanas;
 }
 
 //login (post)
@@ -69,21 +79,7 @@ app.post("/user/login", (req,res)=>{
             message: "Credenciais inválidas",
         });
     }
-
 });
-
-//loadUser não é mais usada. agora user/login autentica e salva usuario
-// app.post("/loadUser", (req,res)=>{
-//     const {email} = req.body;
-
-//     const usuarios = lerUsers();
-
-//     const user = usuarios.find((u) => u.email === email);
-
-//     res.json({
-//         user: {nome: user.nome, email: user.email, cargo: user.cargo, departamento: user.departamento, telefone: user.telefone}
-//     });
-// });
 
 // função de criar(post)
 app.post("/users", (req, res)=>{
@@ -118,7 +114,6 @@ app.get("/user/users", (req, res) => {
     } else {
         res.status(404).json({erro: "Nenhum usuário encontrado"})
     }
-    
 });
 
 //função get by id(get)
@@ -136,7 +131,6 @@ app.get("/user/:id", (req, res) => {
     res.status(200).json(user);
 });
 
-
 //função de update(put)
 app.put("/users/:id", (req, res) => {
     const id = parseInt(req.params.id);
@@ -152,7 +146,6 @@ app.put("/users/:id", (req, res) => {
     res.json(users[index]);
 });
 
-
 //função de delete(delete)
 app.delete('/funcionarios/:id', (req, res)=>{
     const id = parseInt(req.params.id);
@@ -163,33 +156,53 @@ app.delete('/funcionarios/:id', (req, res)=>{
     res.status(204).send();
 });
 
-// POST: Salvar a conclusão do questionário
-// Endpoint: /questionario/concluir
-app.post("/questionario/concluir", (req, res) => {
-    const dadosQuestionario = req.body;
+function salvarModulo(req, res, modulo) {
+    const { cnpj, respostas } = req.body;
 
-    if (!dadosQuestionario || Object.keys(dadosQuestionario).length === 0) {
-        // Retorna erro se o corpo da requisição estiver vazio
-        return res.status(400).json({ erro: "Dados do questionário estão incompletos ou vazios." });
+    if (!cnpj || !respostas || Object.keys(respostas).length === 0) {
+        return res.status(400).json({ erro: `CNPJ e respostas são obrigatórios para salvar ${modulo}.` });
     }
 
-    const questionarios = lerQuestionarios();
-
-    const novoQuestionario = {
-        // Gera um ID sequencial baseado no último ID salvo
-        id: questionarios.length ? questionarios[questionarios.length - 1].id + 1 : 1,
+    const questionarios = lerQuestionariosCompletos();
+    
+    const respostasBooleanas = converterParaBooleano(respostas);
+    
+    const novoRegistro = {
         dataConclusao: new Date().toISOString(),
-        ...dadosQuestionario 
+        respostas: respostasBooleanas
     };
 
-    questionarios.push(novoQuestionario);
-    salvarQuestionarios(questionarios);
+    let empresa = questionarios.find(item => item.cnpj === cnpj);
+
+    if (!empresa) {
+        empresa = { cnpj: cnpj };
+        questionarios.push(empresa);
+    }
     
+    if (!empresa[modulo]) {
+        empresa[modulo] = [];
+    }
+    empresa[modulo].push(novoRegistro);
+
+    salvarQuestionariosCompletos(questionarios);
+
     res.status(201).json({
         success: true,
-        message: "Conclusão do questionário salva com sucesso!",
-        registro: novoQuestionario
+        message: `Questionário de ${modulo} salvo no objeto centralizado!`,
+        cnpj: cnpj
     });
+}
+
+app.post("/governanca/concluir", (req, res) => {
+    salvarModulo(req, res, "governanca");
+});
+
+app.post("/social/concluir", (req, res) => {
+    salvarModulo(req, res, "social");
+});
+
+app.post("/meio_ambiente/concluir", (req, res) => {
+    salvarModulo(req, res, "meio-ambiente");
 });
 
 app.listen(PORT, () => {
