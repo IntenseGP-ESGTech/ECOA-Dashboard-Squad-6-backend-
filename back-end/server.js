@@ -52,6 +52,19 @@ function converterParaBooleano(respostas) {
     return respostasBooleanas;
 }
 
+//loadUser não é mais usada. agora user/login autentica e salva usuario
+// app.post("/loadUser", (req,res)=>{
+//     const {email} = req.body;
+
+//     const usuarios = lerUsers();
+
+//     const user = usuarios.find((u) => u.email === email);
+
+//     res.json({
+//         user: {nome: user.nome, email: user.email, cargo: user.cargo, departamento: user.departamento, telefone: user.telefone}
+//     });
+// });
+
 //login (post)
 app.post("/user/login", (req,res)=>{
     const {email, senha} = req.body;
