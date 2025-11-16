@@ -1,0 +1,43 @@
+[
+  {
+    "cnpj": "12345678000190",
+    "social": [
+      {
+        "dataConclusao": "2025-11-16T21:00:19.090Z",
+        "respostas": {
+          "q1": true,
+          "q2": true,
+          "q3": true
+        }
+      },
+      {
+        "dataConclusao": "2025-11-16T21:00:48.544Z",
+        "respostas": {
+          "q1": false,
+          "q2": true,
+          "q3": false
+        }
+      }
+    ],
+    "meio_ambiente": [
+      {
+        "dataConclusao": "2025-11-16T21:00:29.919Z",
+        "respostas": {
+          "q1": false,
+          "q2": false,
+          "q3": false
+        }
+      }
+    ],
+    "governanca": [
+      {
+        "dataConclusao": "2025-11-16T21:09:06.155Z",
+        "respostas": {
+          "q1": true,
+          "q2": false,
+          "q3": true
+        }
+      }
+    ]
+  }
+]

@@ -1,66 +1,79 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, HelpCircle } from "lucide-react";
 import '../questionario.css';
 import './social.css';
 
+const MOCK_CNPJ = "12345678000190"; 
+
 function QuestionarioSocial() {
+  const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
-  
+  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [statusMessage, setStatusMessage] = useState(''); 
+
   const questions = [
-    {
-      id: 1,
-      type: "multiple",
-      question: "A empresa possui políticas de direitos humanos que mitigam os riscos para o negócio e estão em conformidade com os Princípios Orientadores da ONU sobre Empresas e Direitos Humanos?",
-      options: [
-        "SIM",
-        "NÃO"
-      ]
-    },
-    {
-      id: 2,
-      type: "multiple",
-      question: "A empresa possui um programa de diversidade e inclusão com metas específicas?",
-      options: [
-        "SIM",
-        "NÃO"
-      ]
-    },
-    {
-      id: 3,
-      type: "multiple",
-      question: "A empresa realiza avaliações de impacto social em suas operações e cadeia de fornecimento?",
-      options: [
-        "SIM",
-        "NÃO"
-      ]
-    }
+    { id: 1, type: "multiple", question: "A empresa possui políticas de direitos humanos que mitigam os riscos para o negócio e estão em conformidade com os Princípios Orientadores da ONU sobre Empresas e Direitos Humanos?", options: ["SIM", "NÃO"] },
+    { id: 2, type: "multiple", question: "A empresa possui um programa de diversidade e inclusão com metas específicas?", options: ["SIM", "NÃO"] },
+    { id: 3, type: "multiple", question: "A empresa realiza avaliações de impacto social em suas operações e cadeia de fornecimento?", options: ["SIM", "NÃO"] }
   ];
 
   const handleAnswerChange = (questionId, answer) => {
-    setAnswers({
-      ...answers,
-      [questionId]: answer
-    });
+    setAnswers({ ...answers, ['q' + questionId]: answer }); 
   };
 
   const handleNext = () => {
-    if (currentQuestion < questions.length - 1) {
+    if (answers['q' + questions[currentQuestion].id] && currentQuestion < questions.length - 1) { 
       setCurrentQuestion(currentQuestion + 1);
+      setStatusMessage(''); 
+    } else if (currentQuestion < questions.length - 1) {
+       setStatusMessage('Selecione uma opção para prosseguir.'); 
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
+      setStatusMessage(''); 
     }
   };
 
-  const handleSubmit = () => {
-    alert("Questionário Social enviado com sucesso!");
-    // Aqui você poderia enviar as respostas para um servidor
-    console.log(answers);
+  const handleSubmit = async () => { 
+    if (!answers['q' + questions[currentQuestion].id]) {
+        alert('Por favor, selecione uma opção antes de finalizar.');
+        return;
+    }
+
+    const payload = {
+      cnpj: MOCK_CNPJ, 
+      respostas: answers
+    };
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('http://localhost:3001/social/concluir', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Questionário Social enviado com sucesso!");
+        navigate('/questionario');
+      } else {
+        alert(`Erro ao salvar: ${data.erro || data.message || 'Falha na comunicação com o backend.'}`);
+      }
+    } catch (error) {
+      alert(`Erro de conexão: O servidor (http://localhost:3001) pode estar offline.`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
@@ -73,6 +86,15 @@ function QuestionarioSocial() {
           <h1>Social</h1>
           <p>Avaliação de práticas sociais e direitos humanos</p>
         </div>
+        
+        {statusMessage && (
+          <div className={`status-message p-3 rounded-lg mb-4 text-white font-semibold 
+            ${statusMessage.includes('Sucesso') ? 'bg-green-500' : 
+             statusMessage.includes('Erro') ? 'bg-red-500' : 'bg-blue-500'}`}
+          >
+            {statusMessage}
+          </div>
+        )}
 
         <div className="questionario-content">
           <div className="progress-bar-container">
@@ -91,12 +113,13 @@ function QuestionarioSocial() {
                     <div className="option-item" key={index}>
                       <input 
                         type="radio" 
-                        id={`option-${index}`} 
+                        id={`option-social-${currentQuestionData.id}-${index}`} 
                         name={`question-${currentQuestionData.id}`}
-                        checked={answers[currentQuestionData.id] === option}
+                        checked={answers['q' + currentQuestionData.id] === option}
                         onChange={() => handleAnswerChange(currentQuestionData.id, option)}
+                        disabled={isSubmitting}
                       />
-                      <label htmlFor={`option-${index}`}>{option}</label>
+                      <label htmlFor={`option-social-${currentQuestionData.id}-${index}`}>{option}</label>
                     </div>
                   ))}
                 </div>
@@ -107,7 +130,7 @@ function QuestionarioSocial() {
               <button 
                 className="nav-button back-button"
                 onClick={handlePrevious}
-                disabled={currentQuestion === 0}
+                disabled={currentQuestion === 0 || isSubmitting}
               >
                 <ArrowLeft size={16} /> Anterior
               </button>
@@ -116,6 +139,7 @@ function QuestionarioSocial() {
                 <button 
                   className="nav-button next-button"
                   onClick={handleNext}
+                  disabled={isSubmitting}
                 >
                   Próxima <ArrowRight size={16} />
                 </button>
@@ -123,8 +147,9 @@ function QuestionarioSocial() {
                 <button 
                   className="nav-button submit-button"
                   onClick={handleSubmit}
+                  disabled={isSubmitting || !answers['q' + currentQuestionData.id]}
                 >
-                  Continuar <ArrowRight size={16} />
+                  {isSubmitting ? 'Enviando...' : 'Finalizar Questionário'} <ArrowRight size={16} />
                 </button>
               )}
             </div>

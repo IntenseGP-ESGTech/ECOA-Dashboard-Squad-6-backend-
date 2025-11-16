@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, HelpCircle } from "lucide-react";
 import '../questionario.css';
 
+const MOCK_CNPJ = "12345678000190"; 
+
 function QuestionarioGovernanca() {
+  const navigate = useNavigate(); 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [statusMessage, setStatusMessage] = useState(''); 
   
   const questions = [
     {
@@ -40,7 +45,7 @@ function QuestionarioGovernanca() {
   const handleAnswerChange = (questionId, answer) => {
     setAnswers({
       ...answers,
-      [questionId]: answer
+      ['q' + questionId]: answer 
     });
   };
 
@@ -56,10 +61,42 @@ function QuestionarioGovernanca() {
     }
   };
 
-  const handleSubmit = () => {
-    alert("Questionário de Governança enviado com sucesso!");
-    // Aqui você poderia enviar as respostas para um servidor
-    console.log(answers);
+  const handleSubmit = async () => { 
+    if (!answers['q' + questions[currentQuestion].id]) {
+        alert('Por favor, selecione uma opção antes de finalizar.');
+        return;
+    }
+
+    const payload = {
+      cnpj: MOCK_CNPJ, 
+      respostas: answers
+    };
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('http://localhost:3001/governanca/concluir', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json(); 
+
+      if (response.ok) { 
+        alert("Questionário de Governança enviado com sucesso!"); 
+        navigate('/questionario'); 
+        
+      } else {
+        alert(`Erro ao salvar: ${data.erro || data.message || 'Falha na comunicação com o backend.'}`);
+      }
+    } catch (error) {
+      alert(`Erro de conexão: O servidor (http://localhost:3001) pode estar offline.`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
@@ -72,6 +109,15 @@ function QuestionarioGovernanca() {
           <h1>Governança</h1>
           <p>Avaliação de práticas de governança corporativa</p>
         </div>
+        
+        {statusMessage && (
+          <div className={`status-message p-3 rounded-lg mb-4 text-white font-semibold 
+            ${statusMessage.includes('Sucesso') ? 'bg-green-500' : 
+             statusMessage.includes('Erro') ? 'bg-red-500' : 'bg-blue-500'}`}
+          >
+            {statusMessage}
+          </div>
+        )}
 
         <div className="questionario-content">
           <div className="progress-bar-container">
@@ -90,12 +136,13 @@ function QuestionarioGovernanca() {
                     <div className="option-item" key={index}>
                       <input 
                         type="radio" 
-                        id={`option-${index}`} 
+                        id={`option-gov-${currentQuestionData.id}-${index}`} 
                         name={`question-${currentQuestionData.id}`}
-                        checked={answers[currentQuestionData.id] === option}
+                        checked={answers['q' + currentQuestionData.id] === option}
                         onChange={() => handleAnswerChange(currentQuestionData.id, option)}
+                        disabled={isSubmitting} 
                       />
-                      <label htmlFor={`option-${index}`}>{option}</label>
+                      <label htmlFor={`option-gov-${currentQuestionData.id}-${index}`}>{option}</label>
                     </div>
                   ))}
                 </div>
@@ -106,7 +153,7 @@ function QuestionarioGovernanca() {
               <button 
                 className="nav-button back-button"
                 onClick={handlePrevious}
-                disabled={currentQuestion === 0}
+                disabled={currentQuestion === 0 || isSubmitting}
               >
                 <ArrowLeft size={16} /> Anterior
               </button>
@@ -115,6 +162,7 @@ function QuestionarioGovernanca() {
                 <button 
                   className="nav-button next-button"
                   onClick={handleNext}
+                  disabled={isSubmitting}
                 >
                   Próxima <ArrowRight size={16} />
                 </button>
@@ -122,8 +170,9 @@ function QuestionarioGovernanca() {
                 <button 
                   className="nav-button submit-button"
                   onClick={handleSubmit}
+                  disabled={isSubmitting || !answers['q' + currentQuestionData.id]} 
                 >
-                  Continuar <ArrowRight size={16} />
+                  {isSubmitting ? 'Enviando...' : 'Finalizar Questionário'} <ArrowRight size={16} />
                 </button>
               )}
             </div>
