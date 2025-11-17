@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, HelpCircle } from "lucide-react";
+import {useUser} from "../../../context";
 import '../questionario.css';
 import './social.css';
 
-const MOCK_CNPJ = "12345678000190"; 
 
 function QuestionarioSocial() {
   const navigate = useNavigate();
@@ -12,6 +12,7 @@ function QuestionarioSocial() {
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false); 
   const [statusMessage, setStatusMessage] = useState(''); 
+  const {user} = useUser();
 
   const questions = [
     { id: 1, type: "multiple", question: "A empresa possui políticas de direitos humanos que mitigam os riscos para o negócio e estão em conformidade com os Princípios Orientadores da ONU sobre Empresas e Direitos Humanos?", options: ["SIM", "NÃO"] },
@@ -46,7 +47,7 @@ function QuestionarioSocial() {
     }
 
     const payload = {
-      cnpj: MOCK_CNPJ, 
+      cnpj: user.cnpj, 
       respostas: answers
     };
 

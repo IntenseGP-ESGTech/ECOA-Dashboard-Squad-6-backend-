@@ -84,7 +84,7 @@ app.post("/user/login", (req,res)=>{
     if(user){
         res.status(200).json({
             success : true,
-            user: {email: user.email, nome: user.nome, cargo: user.cargo, departamento: user.departamento, telefone: user.telefone},
+            user: {email: user.email, nome: user.nome, cnpj: user.cnpj}
         });
     } else {
         res.status(401).json({

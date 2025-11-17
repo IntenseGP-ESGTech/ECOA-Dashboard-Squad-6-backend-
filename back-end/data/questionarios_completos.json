@@ -39,5 +39,46 @@
         }
       }
     ]
+  },
+  {
+    "cnpj": "124",
+    "social": [
+      {
+        "dataConclusao": "2025-11-17T19:04:51.169Z",
+        "respostas": {
+          "q1": true,
+          "q2": true,
+          "q3": true
+        }
+      }
+    ],
+    "meio-ambiente": [
+      {
+        "dataConclusao": "2025-11-17T19:10:46.129Z",
+        "respostas": {
+          "q1": true,
+          "q2": true,
+          "q3": true
+        }
+      }
+    ],
+    "governanca": [
+      {
+        "dataConclusao": "2025-11-17T19:11:15.309Z",
+        "respostas": {
+          "q1": true,
+          "q2": true,
+          "q3": true
+        }
+      },
+      {
+        "dataConclusao": "2025-11-17T19:12:06.497Z",
+        "respostas": {
+          "q1": false,
+          "q2": false,
+          "q3": false
+        }
+      }
+    ]
   }
 ]

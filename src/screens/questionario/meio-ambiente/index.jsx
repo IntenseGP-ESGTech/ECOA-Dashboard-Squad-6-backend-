@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, HelpCircle } from "lucide-react";
+import { useUser } from "../../../context";
 import '../questionario.css';
-
-const MOCK_CNPJ = "12345678000190"; 
 
 function QuestionarioMeioAmbiente() {
   const navigate = useNavigate();
@@ -11,7 +10,8 @@ function QuestionarioMeioAmbiente() {
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  
+  const {user}=useUser();
+
   const questions = [
     {
       id: 1,
@@ -72,7 +72,7 @@ function QuestionarioMeioAmbiente() {
     }
 
     const payload = {
-      cnpj: MOCK_CNPJ, 
+      cnpj: user.cnpj, 
       respostas: answers
     };
 
