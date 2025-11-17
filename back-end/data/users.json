@@ -1,7 +1,47 @@
-[{"id":1,
-    "nome":"usuario",
-        "email":"teste@teste.com",
-        "senha":"123456",
-        "cargo":"testador",
-        "departamento": "testes",
-        "telefone": "(00)00000-0000"}]
+[
+  {
+    "id": 1,
+    "nome": "usuario",
+    "email": "teste@teste.com",
+    "senha": "123456",
+    "cargo": "testador",
+    "departamento": "testes",
+    "telefone": "(00)00000-0000"
+  },
+  {
+    "cnpj": "124",
+    "nome": "teste",
+    "email": "teste@teste",
+    "senha": "123456"
+  },
+  {
+    "cnpj": "124",
+    "nome": "123",
+    "email": "teste@teste",
+    "senha": "123"
+  },
+  {
+    "cnpj": "333",
+    "nome": "123",
+    "email": "teste@teste",
+    "senha": "123"
+  },
+  {
+    "cnpj": "335",
+    "nome": "123",
+    "email": "teste@teste",
+    "senha": "123"
+  },
+  {
+    "cnpj": "3389",
+    "nome": "123",
+    "email": "teste@teste",
+    "senha": "123"
+  },
+  {
+    "cnpj": "3388",
+    "nome": "123",
+    "email": "teste@teste",
+    "senha": "123"
+  }
+]

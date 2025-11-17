@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaBuilding, FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
-
+import { register } from './register.js';
 const CadastroEmpresa = () => {
   const [formData, setFormData] = useState({
     cnpj: '',
@@ -8,6 +8,11 @@ const CadastroEmpresa = () => {
     nomeSocial: '',
     senha: '',
     confirmarSenha: ''
+  });
+  
+  const [registerState, setRegisterState] = useState({
+    visible: false,
+    message: ""
   });
 
   const handleChange = (e) => {
@@ -17,9 +22,28 @@ const CadastroEmpresa = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Lógica de cadastro aqui
+    setRegisterState({visible: false, message:""})
+    if(!formData.cnpj || !formData.email || !formData.nomeSocial || !formData.senha || !formData.confirmarSenha){
+      setRegisterState({visible: true, message:"Por favor, preencha todos os campos"})
+    } else if (formData.senha != formData.confirmarSenha){
+      setRegisterState({visible: true, message:"As senhas são divergentes"})
+    } else {
+      const result = await register(formData.cnpj, formData.email, formData.nomeSocial, formData.senha);
+      console.log(result)
+      if(result.success == true){
+        setRegisterState({visible: true, message:"Usuário criado com sucesso!"})
+        setFormData({cnpj: '',
+          email: '',
+          nomeSocial: '',
+          senha: '',
+          confirmarSenha: ''})
+      } else {
+        setRegisterState({visible: true, message:result.erro})
+      }
+    }
+
   };
 
   return (
@@ -98,6 +122,7 @@ const CadastroEmpresa = () => {
           Cadastrar
         </button>
       </form>
+      {registerState.visible && (<p className="login-welcome-title">{registerState.message}</p>)}
     </div>
   );
 };
