@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, HelpCircle } from "lucide-react";
 import {useUser} from "../../../context";
+import {salvaQuestionario} from "../submit";
 import '../questionario.css';
 import './social.css';
 
@@ -40,7 +41,7 @@ function QuestionarioSocial() {
     }
   };
 
-  const handleSubmit = async () => { 
+  const handleSubmit = () => { 
     if (!answers['q' + questions[currentQuestion].id]) {
         alert('Por favor, selecione uma opção antes de finalizar.');
         return;
@@ -48,33 +49,17 @@ function QuestionarioSocial() {
 
     const payload = {
       cnpj: user.cnpj, 
+      modulo: "social",
       respostas: answers
     };
 
     setIsSubmitting(true);
 
-    try {
-      const response = await fetch('http://localhost:3001/social/concluir', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
+    salvaQuestionario(payload);
 
-      const data = await response.json();
+    setIsSubmitting(false);
 
-      if (response.ok) {
-        alert("Questionário Social enviado com sucesso!");
-        navigate('/questionario');
-      } else {
-        alert(`Erro ao salvar: ${data.erro || data.message || 'Falha na comunicação com o backend.'}`);
-      }
-    } catch (error) {
-      alert(`Erro de conexão: O servidor (http://localhost:3001) pode estar offline.`);
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigate('/questionario');
   };
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;

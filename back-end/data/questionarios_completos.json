@@ -1,84 +1,38 @@
 [
   {
-    "cnpj": "12345678000190",
-    "social": [
-      {
-        "dataConclusao": "2025-11-16T21:00:19.090Z",
-        "respostas": {
-          "q1": true,
-          "q2": true,
-          "q3": true
-        }
-      },
-      {
-        "dataConclusao": "2025-11-16T21:00:48.544Z",
-        "respostas": {
-          "q1": false,
-          "q2": true,
-          "q3": false
-        }
-      }
-    ],
-    "meio_ambiente": [
-      {
-        "dataConclusao": "2025-11-16T21:00:29.919Z",
-        "respostas": {
-          "q1": false,
-          "q2": false,
-          "q3": false
-        }
-      }
-    ],
-    "governanca": [
-      {
-        "dataConclusao": "2025-11-16T21:09:06.155Z",
-        "respostas": {
-          "q1": true,
-          "q2": false,
-          "q3": true
-        }
-      }
-    ]
+    "cnpj": "1234",
+    "governanca": {
+      "q1": true,
+      "q2": false,
+      "q3": true
+    },
+    "social": {
+      "q1": true,
+      "q2": true,
+      "q3": true
+    },
+    "meio_ambiente": {
+      "q1": false,
+      "q2": false,
+      "q3": false
+    }
   },
   {
-    "cnpj": "124",
-    "social": [
-      {
-        "dataConclusao": "2025-11-17T19:04:51.169Z",
-        "respostas": {
-          "q1": true,
-          "q2": true,
-          "q3": true
-        }
-      }
-    ],
-    "meio-ambiente": [
-      {
-        "dataConclusao": "2025-11-17T19:10:46.129Z",
-        "respostas": {
-          "q1": true,
-          "q2": true,
-          "q3": true
-        }
-      }
-    ],
-    "governanca": [
-      {
-        "dataConclusao": "2025-11-17T19:11:15.309Z",
-        "respostas": {
-          "q1": true,
-          "q2": true,
-          "q3": true
-        }
-      },
-      {
-        "dataConclusao": "2025-11-17T19:12:06.497Z",
-        "respostas": {
-          "q1": false,
-          "q2": false,
-          "q3": false
-        }
-      }
-    ]
+    "cnpj": "999",
+    "governanca": {
+      "q1": true,
+      "q2": true,
+      "q3": true
+    },
+    "social": {
+      "q1": true,
+      "q2": true,
+      "q3": true
+    },
+    "meio_ambiente": {
+      "q1": true,
+      "q2": true,
+      "q3": true
+    }
   }
 ]
