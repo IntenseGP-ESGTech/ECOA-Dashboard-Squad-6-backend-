@@ -174,43 +174,8 @@ app.delete('/funcionarios/:id', (req, res)=>{
 });
 
 //questionários
-// function salvarModulo(req, res) {
-//     const { cnpj, respostas, modulo} = req.body;
 
-//     if (!cnpj || !respostas || Object.keys(respostas).length === 0) {
-//         return res.status(400).json({ erro: `CNPJ e respostas são obrigatórios para salvar ${modulo}.` });
-//     }
-
-//     const questionarios = lerQuestionariosCompletos();
-    
-//     const respostasBooleanas = converterParaBooleano(respostas);
-    
-//     const novoRegistro = {
-//         dataConclusao: new Date().toISOString(),
-//         respostas: respostasBooleanas
-//     };
-
-//     let empresa = questionarios.find(item => item.cnpj === cnpj);
-
-//     if (!empresa) {
-//         empresa = { cnpj: cnpj , governanca:{q1: false, q2: false, q3: false}};
-//         questionarios.push(empresa);
-//     }
-    
-//     if (!empresa[modulo]) {
-//         empresa[modulo] = [];
-//     }
-//     empresa[modulo].push(novoRegistro);
-
-//     salvarQuestionariosCompletos(questionarios);
-
-//     res.status(201).json({
-//         success: true,
-//         message: `Questionário de ${modulo} salvo no objeto centralizado!`,
-//         cnpj: cnpj
-//     });
-// }
-
+//Cria e sobrescreve uma resposta de questionário
 app.post("/questionario/salvar", (req, res) => {
     const { cnpj, respostas, modulo} = req.body;
 
@@ -238,6 +203,22 @@ app.post("/questionario/salvar", (req, res) => {
         message: `Questionário de ${modulo} salvo no objeto centralizado!`,
         cnpj: cnpj
     });
+})
+
+//get resposta de questionário 
+
+app.get("/questionario/:cnpj", (req,res) => {
+    const cnpj = req.params.cnpj;
+
+    const questionarios = lerQuestionariosCompletos();
+
+    const resposta = questionarios.find(item => item.cnpj === cnpj)
+
+    if(!resposta){
+        return res.status(404).json({erro: "Resposta de questionário referente a esse CNPJ não encontrado"});
+    }
+
+    res.status(200).json(resposta);
 })
 
 app.listen(PORT, () => {
