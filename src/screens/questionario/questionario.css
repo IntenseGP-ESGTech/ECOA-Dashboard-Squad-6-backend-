@@ -190,6 +190,47 @@
   background-color: #218838;
 }
 
+.front-link {
+  font-size: 16px;
+  display: inline-block;
+  margin-top: 2rem;
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: right;
+  gap: 0.5rem;
+}
+
+.front-link:hover {
+  text-decoration: underline;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit; /* mantém a cor do link */
+}
+
+.resultado-content{
+  background-color: #003d82;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+}
+
+.centraliza-questionario{
+  margin-left: auto;
+  margin-right: auto;
+}
 @media (max-width: 768px) {
   .questionario-container {
     padding: 1rem;

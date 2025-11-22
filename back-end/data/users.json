@@ -40,5 +40,11 @@
     "nome": "999",
     "email": "teste999@teste.com",
     "senha": "1234"
+  },
+  {
+    "cnpj": "001",
+    "nome": "teste001",
+    "email": "teste001@teste",
+    "senha": "1234"
   }
 ]

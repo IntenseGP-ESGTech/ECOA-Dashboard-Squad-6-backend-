@@ -34,5 +34,23 @@
       "q2": true,
       "q3": true
     }
+  },
+  {
+    "cnpj": "001",
+    "governanca": {
+      "q1": true,
+      "q2": true,
+      "q3": true
+    },
+    "social": {
+      "q1": true,
+      "q2": true,
+      "q3": true
+    },
+    "meio_ambiente": {
+      "q1": true,
+      "q2": true,
+      "q3": true
+    }
   }
 ]

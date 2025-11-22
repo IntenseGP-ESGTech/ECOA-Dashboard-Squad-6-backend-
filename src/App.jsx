@@ -20,6 +20,7 @@ import Questionario from "../src/screens/questionario";
 import QuestionarioSocial from "../src/screens/questionario/social";
 import QuestionarioMeioAmbiente from "../src/screens/questionario/meio-ambiente";
 import QuestionarioGovernanca from "../src/screens/questionario/governanca";
+import QuestionarioResultado from "../src/screens/questionario/resultado";
 import PlanoAcao from "../src/screens/plano_acao";
 import Relatorio from "../src/screens/relatorio";
 import Config from "../src/screens/config";
@@ -126,6 +127,13 @@ function App() {
               }
             />
             
+            <Route
+              path="/questionario/resultado"
+              element={
+                isAuthenticated ? <QuestionarioResultado /> : <Navigate to="/login" replace />
+              }
+            />
+
             <Route
               path="/plano-acao"
               element={
