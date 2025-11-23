@@ -3,9 +3,11 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { OAuth2Client } from "google-auth-library";
 
 const app = express();
 const PORT = 3001;
+const client = new OAuth2Client("ID google aqui");
 
 app.use(cors());
 app.use(express.json());
@@ -64,6 +66,47 @@ function converterParaBooleano(respostas) {
 //         user: {nome: user.nome, email: user.email, cargo: user.cargo, departamento: user.departamento, telefone: user.telefone}
 //     });
 // });
+
+//autenticação google
+app.post("/auth/google", async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: "ID google aqui",
+    });
+
+    const payload = ticket.getPayload();
+
+    // Dados do Google
+    const userInfo = {
+      nome: payload.name,
+      email: payload.email,
+      picture: payload.picture,
+      sub: payload.sub, // ID do usuário no Google
+    };
+
+    console.log("Usuário autenticado pelo Google:", userInfo);
+
+    const data = lerUsers();
+    
+    const user = data.find(u => u.email === userInfo.email);
+
+    if (!user) {
+        data.push(userInfo);
+        salvarUsers(data);
+    }
+
+    res.json({
+      success: true,
+      user: userInfo,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ success: false, error: "Token inválido" });
+  }
+});
 
 //login (post)
 app.post("/user/login", (req,res)=>{

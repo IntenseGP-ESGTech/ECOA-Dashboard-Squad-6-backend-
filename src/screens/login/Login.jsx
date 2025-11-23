@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 import { FaUser, FaLock, FaBuilding } from "react-icons/fa";
@@ -23,6 +23,42 @@ const Login = ({ setIsAuthenticated }) => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  useEffect(() => {
+    /* global google */
+    google.accounts.id.initialize({
+      client_id: "ID google aqui",
+      callback: handleGoogleLogin
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("googleLoginButton"),
+      { theme: "outline", size: "large" }
+    );
+  }, []);
+
+  const handleGoogleLogin = async (response) => {
+    const idToken = response.credential; // JWT do Google
+
+    console.log("ID TOKEN:", idToken);
+
+    // Envia para o backend
+    const resp = await fetch("http://localhost:3001/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: idToken }),
+    });
+
+    const data = await resp.json();
+
+    if (data.success) {
+      login(data.user); // salva no contexto
+      setIsAuthenticated(true);
+      navigate("/dashboard", { replace: true });
+    } else {
+      alert("Erro ao autenticar com Google");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -130,7 +166,8 @@ const Login = ({ setIsAuthenticated }) => {
               </button>
             </Link>
 
-            <div className="login-google-container">
+            <div id="googleLoginButton"></div>
+            {/* <div className="login-google-container">
               <p className="login-google-text">Faça login com</p>
               <a 
                 href="https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.google.com%2Fwebhp%3Fhl%3Dpt-BR%26sa%3DX%26ved%3D0ahUKEwjg2I3cotONAxXdExAIHXtONRoQPAgJ&ec=futura_exp_og_so_72776762_e&hl=pt-BR&ifkv=AdBytiP27OkCLHw4d-G9GZKVCqNXt5LBEk1yrsckBYHRPZbscAcmoomvU1K8mcrlCVlZ868CiVZy&passive=true&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S2030322199%3A1748888327008065"
@@ -140,7 +177,7 @@ const Login = ({ setIsAuthenticated }) => {
               >
                 <img src="/assets/google.png" alt="Google Login" className="login-google-icon" />
               </a>
-            </div>
+            </div> */}
           </div>
         </form>
       </div>
