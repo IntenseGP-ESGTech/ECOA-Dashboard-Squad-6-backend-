@@ -22,6 +22,7 @@ import QuestionarioMeioAmbiente from "../src/screens/questionario/meio-ambiente"
 import QuestionarioGovernanca from "../src/screens/questionario/governanca";
 import QuestionarioResultado from "../src/screens/questionario/resultado";
 import PlanoAcao from "../src/screens/plano_acao";
+import TrilhaAprendizado from "../src/screens/trilha_aprendizado";
 import Relatorio from "../src/screens/relatorio";
 import Config from "../src/screens/config";
 import Sair from "../src/screens/sair";
@@ -138,6 +139,13 @@ function App() {
               path="/plano-acao"
               element={
                 isAuthenticated ? <PlanoAcao /> : <Navigate to="/login" replace />
+              }
+            />
+
+            <Route
+              path="/trilha-aprendizado"
+              element={
+                isAuthenticated ? <TrilhaAprendizado /> : <Navigate to="/login" replace />
               }
             />
             

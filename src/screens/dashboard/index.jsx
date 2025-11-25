@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, Play, Accessibility, Bell, Mail, BarChart2, FileText, Users, Clipboard, Award, ChevronRight, CircleUserRound, GraduationCap, FilePenLine, Target, ClipboardList, Cog, LogOut } from "lucide-react";
+import { Menu, Play, Accessibility, Bell, Mail, BarChart2, FileText, Users, Clipboard, Award, ChevronRight, CircleUserRound, GraduationCap, FilePenLine, Target, ClipboardList, BookOpen, Cog, LogOut } from "lucide-react";
 import './dashboard.css';
 
 function Dashboard() {
@@ -106,6 +106,10 @@ function Dashboard() {
             <Link to="/plano-acao" className="sidebar-icon">
               <Target size={30} />
               <span className="sidebar-icon-text">Plan. Ação</span>
+            </Link>
+            <Link to="/trilha-aprendizado" className="sidebar-icon">
+              <BookOpen size={30} />
+              <span className="sidebar-icon-text">Trilhas</span>
             </Link>
             <Link to="/relatorio" className="sidebar-icon">
               <ClipboardList size={30} />
