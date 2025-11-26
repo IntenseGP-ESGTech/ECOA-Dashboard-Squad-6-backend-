@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Plus, Trash2, Edit2, BookOpen, Users, Clock, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./trilha_aprendizado.css";
@@ -6,48 +6,26 @@ import FormTrilha from "./FormTrilha";
 import FormModulo from "./FormModulo";
 
 function TrilhaAprendizado() {
-  const [trilhas, setTrilhas] = useState([
-    {
-      id: 1,
-      nome: "Desenvolvimento Web com React",
-      descricao: "Aprenda React do zero ao avançado com projetos práticos",
-      responsavel: "Carlos Silva",
-      dataC: "2025-01-15",
-      dataPrevista: "2025-06-30",
-      status: "em-andamento",
-      modulos: [
-        { id: 1, nome: "Introdução ao React", duracao: "4 semanas", concluido: true },
-        { id: 2, nome: "Componentes e Props", duracao: "3 semanas", concluido: true },
-        { id: 3, nome: "Hooks e Estado", duracao: "4 semanas", concluido: false },
-      ]
-    },
-    {
-      id: 2,
-      nome: "Metodologia Ágil e Scrum",
-      descricao: "Dominar as práticas ágeis e Scrum para gestão de projetos",
-      responsavel: "Ana Oliveira",
-      dataC: "2025-02-01",
-      dataPrevista: "2025-05-15",
-      status: "pendente",
-      modulos: [
-        { id: 4, nome: "Fundamentos do Scrum", duracao: "2 semanas", concluido: false },
-      ]
-    },
-    {
-      id: 3,
-      nome: "Design Thinking e Inovação",
-      descricao: "Desenvolva habilidades de criatividade e inovação com Design Thinking",
-      responsavel: "Roberto Martins",
-      dataC: "2024-12-10",
-      dataPrevista: "2025-04-30",
-      status: "concluido",
-      modulos: [
-        { id: 5, nome: "Empatia e Pesquisa", duracao: "2 semanas", concluido: true },
-        { id: 6, nome: "Ideação", duracao: "2 semanas", concluido: true },
-        { id: 7, nome: "Prototipagem", duracao: "3 semanas", concluido: true },
-      ]
+  const [trilhas, setTrilhas] = useState([]);
+  const API = 'http://localhost:3001';
+
+  // Carrega trilhas do backend
+  useEffect(() => {
+    async function fetchTrilhas() {
+      try {
+        const res = await fetch(`${API}/trilhas`);
+        if (res.ok) {
+          const data = await res.json();
+          setTrilhas(data);
+        } else {
+          console.error('Erro ao buscar trilhas', res.status);
+        }
+      } catch (err) {
+        console.error('Erro na requisição de trilhas', err);
+      }
     }
-  ]);
+    fetchTrilhas();
+  }, []);
 
   const [showFormTrilha, setShowFormTrilha] = useState(false);
   const [showFormModulo, setShowFormModulo] = useState(false);
@@ -81,24 +59,48 @@ function TrilhaAprendizado() {
     setShowFormTrilha(true);
   };
 
-  const handleSaveTrilha = (formData) => {
-    if (editingTrilha) {
-      setTrilhas(trilhas.map(t => t.id === editingTrilha.id ? { ...formData, id: t.id, modulos: t.modulos } : t));
-    } else {
-      const newTrilha = {
-        ...formData,
-        id: Math.max(...trilhas.map(t => t.id), 0) + 1,
-        modulos: []
-      };
-      setTrilhas([...trilhas, newTrilha]);
+  const handleSaveTrilha = async (formData) => {
+    try {
+      if (editingTrilha) {
+        const res = await fetch(`${API}/trilhas/${editingTrilha.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setTrilhas(trilhas.map(t => t.id === updated.id ? updated : t));
+        }
+      } else {
+        const res = await fetch(`${API}/trilhas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        if (res.ok) {
+          const created = await res.json();
+          setTrilhas(prev => [...prev, created]);
+        }
+      }
+    } catch (err) {
+      console.error('Erro salvando trilha', err);
+    } finally {
+      setShowFormTrilha(false);
+      setEditingTrilha(null);
     }
-    setShowFormTrilha(false);
-    setEditingTrilha(null);
   };
 
-  const handleDeleteTrilha = (id) => {
-    if (window.confirm("Tem certeza que deseja deletar esta trilha?")) {
-      setTrilhas(trilhas.filter(t => t.id !== id));
+  const handleDeleteTrilha = async (id) => {
+    if (!window.confirm("Tem certeza que deseja deletar esta trilha?")) return;
+    try {
+      const res = await fetch(`${API}/trilhas/${id}`, { method: 'DELETE' });
+      if (res.status === 204) {
+        setTrilhas(prev => prev.filter(t => t.id !== id));
+      } else {
+        console.error('Erro ao deletar trilha', res.status);
+      }
+    } catch (err) {
+      console.error('Erro na requisição delete trilha', err);
     }
   };
 
@@ -107,46 +109,48 @@ function TrilhaAprendizado() {
     setShowFormModulo(true);
   };
 
-  const handleSaveModulo = (moduloData) => {
-    if (selectedTrilhaForModulo) {
-      setTrilhas(trilhas.map(t => 
-        t.id === selectedTrilhaForModulo.id 
-          ? {
-              ...t,
-              modulos: [...t.modulos, {
-                id: Math.max(...t.modulos.map(m => m.id), 0) + 1,
-                ...moduloData,
-                concluido: false
-              }]
-            }
-          : t
-      ));
+  const handleSaveModulo = async (moduloData) => {
+    if (!selectedTrilhaForModulo) return;
+    try {
+      const res = await fetch(`${API}/trilhas/${selectedTrilhaForModulo.id}/modulos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(moduloData)
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setTrilhas(prev => prev.map(t => t.id === selectedTrilhaForModulo.id ? { ...t, modulos: [...t.modulos, created] } : t));
+      }
+    } catch (err) {
+      console.error('Erro adicionando módulo', err);
+    } finally {
       setShowFormModulo(false);
       setSelectedTrilhaForModulo(null);
     }
   };
 
-  const handleDeleteModulo = (trilhaId, moduloId) => {
-    if (window.confirm("Tem certeza que deseja deletar este módulo?")) {
-      setTrilhas(trilhas.map(t =>
-        t.id === trilhaId
-          ? { ...t, modulos: t.modulos.filter(m => m.id !== moduloId) }
-          : t
-      ));
+  const handleDeleteModulo = async (trilhaId, moduloId) => {
+    if (!window.confirm("Tem certeza que deseja deletar este módulo?")) return;
+    try {
+      const res = await fetch(`${API}/trilhas/${trilhaId}/modulos/${moduloId}`, { method: 'DELETE' });
+      if (res.status === 204) {
+        setTrilhas(prev => prev.map(t => t.id === trilhaId ? { ...t, modulos: t.modulos.filter(m => m.id !== moduloId) } : t));
+      }
+    } catch (err) {
+      console.error('Erro deletando módulo', err);
     }
   };
 
-  const handleToggleModuloConcluido = (trilhaId, moduloId) => {
-    setTrilhas(trilhas.map(t =>
-      t.id === trilhaId
-        ? {
-            ...t,
-            modulos: t.modulos.map(m =>
-              m.id === moduloId ? { ...m, concluido: !m.concluido } : m
-            )
-          }
-        : t
-    ));
+  const handleToggleModuloConcluido = async (trilhaId, moduloId) => {
+    try {
+      const res = await fetch(`${API}/trilhas/${trilhaId}/modulos/${moduloId}/toggle`, { method: 'PATCH' });
+      if (res.ok) {
+        const updated = await res.json();
+        setTrilhas(prev => prev.map(t => t.id === trilhaId ? { ...t, modulos: t.modulos.map(m => m.id === updated.id ? updated : m) } : t));
+      }
+    } catch (err) {
+      console.error('Erro toggling módulo', err);
+    }
   };
 
   const filteredTrilhas = trilhas.filter(trilha => {

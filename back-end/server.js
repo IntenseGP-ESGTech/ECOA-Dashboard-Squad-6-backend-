@@ -45,6 +45,137 @@ function salvarQuestionariosCompletos(data) {
     fs.writeFileSync(questionariosCompletosPath, JSON.stringify(data, null, 2));
 }
 
+// Configuração Trilhas
+const trilhasFilePath = path.join(__dirname, "data", "trilhas.json");
+
+function lerTrilhas() {
+    try {
+        const data = fs.readFileSync(trilhasFilePath, "utf-8");
+        if (data.trim().length > 0) {
+            return JSON.parse(data);
+        }
+        return [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function salvarTrilhas(trilhas) {
+    fs.writeFileSync(trilhasFilePath, JSON.stringify(trilhas, null, 2));
+}
+
+// Endpoints Trilhas CRUD
+app.get('/trilhas', (req, res) => {
+    const trilhas = lerTrilhas();
+    res.status(200).json(trilhas);
+});
+
+app.post('/trilhas', (req, res) => {
+    const { nome, descricao, responsavel, dataC, dataPrevista, status } = req.body;
+
+    if (!nome || !descricao || !responsavel || !dataPrevista) {
+        return res.status(400).json({ success: false, erro: 'Campos obrigatórios faltando' });
+    }
+
+    const trilhas = lerTrilhas();
+    const newId = trilhas.length > 0 ? Math.max(...trilhas.map(t => t.id)) + 1 : 1;
+
+    const novaTrilha = {
+        id: newId,
+        nome,
+        descricao,
+        responsavel,
+        dataC: dataC || new Date().toISOString().split('T')[0],
+        dataPrevista,
+        status: status || 'pendente',
+        modulos: []
+    };
+
+    trilhas.push(novaTrilha);
+    salvarTrilhas(trilhas);
+
+    res.status(201).json(novaTrilha);
+});
+
+app.put('/trilhas/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const trilhas = lerTrilhas();
+    const index = trilhas.findIndex(t => t.id === id);
+
+    if (index === -1) return res.status(404).json({ erro: 'Trilha não encontrada' });
+
+    // Mantém id e modulos a menos que sejam enviados
+    const updated = { ...trilhas[index], ...req.body, id: trilhas[index].id };
+    if (!Array.isArray(updated.modulos)) updated.modulos = trilhas[index].modulos || [];
+
+    trilhas[index] = updated;
+    salvarTrilhas(trilhas);
+
+    res.status(200).json(trilhas[index]);
+});
+
+app.delete('/trilhas/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    let trilhas = lerTrilhas();
+    const exists = trilhas.some(t => t.id === id);
+    if (!exists) return res.status(404).json({ erro: 'Trilha não encontrada' });
+
+    trilhas = trilhas.filter(t => t.id !== id);
+    salvarTrilhas(trilhas);
+    res.status(204).send();
+});
+
+// Módulos
+app.post('/trilhas/:id/modulos', (req, res) => {
+    const trilhaId = parseInt(req.params.id);
+    const { nome, duracao } = req.body;
+    if (!nome || !duracao) return res.status(400).json({ erro: 'Nome e duração são obrigatórios' });
+
+    const trilhas = lerTrilhas();
+    const index = trilhas.findIndex(t => t.id === trilhaId);
+    if (index === -1) return res.status(404).json({ erro: 'Trilha não encontrada' });
+
+    const modulos = trilhas[index].modulos || [];
+    const newId = modulos.length > 0 ? Math.max(...modulos.map(m => m.id)) + 1 : 1;
+
+    const novoModulo = { id: newId, nome, duracao, concluido: false };
+    trilhas[index].modulos = [...modulos, novoModulo];
+    salvarTrilhas(trilhas);
+
+    res.status(201).json(novoModulo);
+});
+
+app.delete('/trilhas/:trilhaId/modulos/:moduloId', (req, res) => {
+    const trilhaId = parseInt(req.params.trilhaId);
+    const moduloId = parseInt(req.params.moduloId);
+
+    const trilhas = lerTrilhas();
+    const index = trilhas.findIndex(t => t.id === trilhaId);
+    if (index === -1) return res.status(404).json({ erro: 'Trilha não encontrada' });
+
+    trilhas[index].modulos = (trilhas[index].modulos || []).filter(m => m.id !== moduloId);
+    salvarTrilhas(trilhas);
+    res.status(204).send();
+});
+
+app.patch('/trilhas/:trilhaId/modulos/:moduloId/toggle', (req, res) => {
+    const trilhaId = parseInt(req.params.trilhaId);
+    const moduloId = parseInt(req.params.moduloId);
+
+    const trilhas = lerTrilhas();
+    const tIndex = trilhas.findIndex(t => t.id === trilhaId);
+    if (tIndex === -1) return res.status(404).json({ erro: 'Trilha não encontrada' });
+
+    const modulos = trilhas[tIndex].modulos || [];
+    const mIndex = modulos.findIndex(m => m.id === moduloId);
+    if (mIndex === -1) return res.status(404).json({ erro: 'Módulo não encontrado' });
+
+    trilhas[tIndex].modulos[mIndex].concluido = !trilhas[tIndex].modulos[mIndex].concluido;
+    salvarTrilhas(trilhas);
+
+    res.status(200).json(trilhas[tIndex].modulos[mIndex]);
+});
+
 //conversão para booleano
 function converterParaBooleano(respostas) {
     const respostasBooleanas = {};

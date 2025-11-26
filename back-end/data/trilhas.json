@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1,
+    "nome": "Engenharia de Dados",
+    "descricao": "Aprender sobre Arquitetura Medalhão",
+    "responsavel": "Felipe Cisneiros",
+    "dataC": "2025-11-26",
+    "dataPrevista": "2025-12-31",
+    "status": "em-andamento",
+    "modulos": [
+      {
+        "id": 1,
+        "nome": "Introdução a Engenharia de Dados",
+        "duracao": "1 semana, 10 horas",
+        "concluido": true
+      },
+      {
+        "id": 2,
+        "nome": "Arquitetura Medalhão",
+        "duracao": "1 semana, 10 horas",
+        "concluido": false
+      }
+    ]
+  }
+]
